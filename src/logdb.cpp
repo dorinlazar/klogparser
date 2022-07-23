@@ -4,9 +4,6 @@
 
 //    '$remote_addr - $remote_user [$time_local] "$request" ' '$status $body_bytes_sent "$http_referer" '
 //    '"$http_user_agent" "$http_x_forwarded_for"';
-
-// ([0-9]+) ([0-9]+) "([^"]+)" "([^"]+)".*)%">;
-
 void LogDatabase::AddLogStatement(std::string_view line) {
   LogInfo li;
 
@@ -42,6 +39,7 @@ void LogDatabase::AddLogStatement(std::string_view line) {
     li.http_user_agent = reader.ReadUntil('"');
     std::cout << li.http_user_agent << std::endl;
   } catch (const std::exception& ex) {
+    std::cout << "Bad line : " << line << std::endl;
     return;
   }
 }

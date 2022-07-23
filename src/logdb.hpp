@@ -7,7 +7,8 @@
 class LogDatabase {
 public:
   void AddLogStatement(const std::string& log);
+  void AddLogFile(const std::string& path);
 
 private:
-  std::multimap < DateTime
+  std::multimap<kl::DateTime, LogInfo> m_logs;
 };

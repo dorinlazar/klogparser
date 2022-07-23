@@ -1,9 +1,11 @@
 #pragma once
+
 #include <array>
 #include <compare>
 #include <cstdint>
 #include <sys/time.h>
 #include <string>
+#include <optional>
 
 namespace kl {
 
@@ -63,7 +65,6 @@ struct TimeSpan {
   constexpr TimeSpan operator+(const TimeSpan& ts) const { return {.ticks = ticks + ts.ticks}; }
 };
 
-// Interface inspired after the C# Datetime
 class DateTime {
   // One Tick represents 100 nanoseconds.
   int64_t _ticks = TimeLimits::MIN_TICKS;
@@ -81,7 +82,7 @@ public:
   TimeOfDay GetTimeOfDay() const;
   Date GetDate() const;
   static DateTime FromTicks(int64_t ticks);
-  static DateTime Parse(const std::string& src);
+  static std::optional<DateTime> Parse(const std::string& src);
 
 public:
   DateTime& operator=(const DateTime& d) = default;

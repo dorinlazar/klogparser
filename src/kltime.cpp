@@ -2,6 +2,8 @@
 
 #include <algorithm>
 #include <chrono>
+#include <ctre.hpp>
+#include <map>
 
 namespace kl {
 
@@ -108,5 +110,34 @@ DateTime::DateTime(uint32_t year, uint32_t month, uint32_t day, uint32_t hour, u
 TimeSpan DateTime::operator-(DateTime d) { return {.ticks = _ticks - d._ticks}; }
 DateTime DateTime::operator-(TimeSpan ts) { return FromTicks(_ticks - ts.ticks); }
 DateTime DateTime::operator+(TimeSpan ts) { return FromTicks(_ticks + ts.ticks); }
+
+// auto date_format = ctre::match<
+//     R"(([0-3][0-9])/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/20([1-9][0-9]):([0-2][0-9]):([0-5][0-9]):([0-5][0-9])
+//     ([\+\-])([01][0-9])([0-5][0-9]))">;
+auto date_format = ctre::match<
+    R"(([0-3][0-9])/([JFMASOND][aepuco][nbrynlgptvc])/20([1-9][0-9]:[0-2][0-9]:[0-5][0-9]:[0-5][0-9] [\+\-][01][0-9][0-5][0-9]))">;
+
+std::map<std::string, uint32_t> months = {{"Jan", 1}, {"Feb", 2}, {"Mar", 3}, {"Apr", 4},  {"May", 5},  {"Jun", 6},
+                                          {"Jul", 7}, {"Aug", 8}, {"Sep", 9}, {"Oct", 10}, {"Nov", 11}, {"Dec", 12}};
+
+std::optional<DateTime> DateTime::Parse(const std::string& dt) {
+  auto parsed = date_format(dt);
+  if (!parsed.get<0>()) {
+    return std::nullopt;
+  }
+  auto view = parsed.get<1>().to_view();
+  uint32_t day = (view[0] - '0') * 10 + view[1] - '0';
+  auto it = months.find(std::string(parsed.get<2>()));
+  if (it == months.end()) {
+    return std::nullopt;
+  }
+  uint32_t month = it->second;
+  view = parsed.get<3>().to_view();
+  uint32_t year = 2000 + (view[0] - '0') * 10 + view[1] - '0';
+  uint32_t hour = (view[3] - '0') * 10 + view[4] - '0';
+  uint32_t minute = (view[6] - '0') * 10 + view[7] - '0';
+  uint32_t second = (view[9] - '0') * 10 + view[10] - '0';
+  return DateTime(year, month, day, hour, minute, second);
+}
 
 } // namespace kl

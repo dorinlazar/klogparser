@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <sys/time.h>
 #include <string>
+#include <string_view>
 #include <optional>
 
 namespace kl {
@@ -82,7 +83,7 @@ public:
   TimeOfDay GetTimeOfDay() const;
   Date GetDate() const;
   static DateTime FromTicks(int64_t ticks);
-  static std::optional<DateTime> Parse(const std::string& src);
+  static std::optional<DateTime> Parse(std::string_view src);
 
 public:
   DateTime& operator=(const DateTime& d) = default;

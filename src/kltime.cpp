@@ -117,11 +117,12 @@ DateTime DateTime::operator+(TimeSpan ts) { return FromTicks(_ticks + ts.ticks);
 // auto date_format = ctre::match<R"(([0-3][0-9]/[A-Z][a-z][a-z]/20[1-9][0-9]))">;
 // auto time_format = ctre::match<R"(:([0-2][0-9]:[0-5][0-9]:[0-5][0-9] [\+\-][01][0-9][0-5][0-9]))">;
 
-std::map<std::string, uint32_t> months = {{"Jan", 1}, {"Feb", 2}, {"Mar", 3}, {"Apr", 4},  {"May", 5},  {"Jun", 6},
-                                          {"Jul", 7}, {"Aug", 8}, {"Sep", 9}, {"Oct", 10}, {"Nov", 11}, {"Dec", 12}};
+std::map<std::string_view, uint32_t> months = {{"Jan", 1}, {"Feb", 2},  {"Mar", 3},  {"Apr", 4},
+                                               {"May", 5}, {"Jun", 6},  {"Jul", 7},  {"Aug", 8},
+                                               {"Sep", 9}, {"Oct", 10}, {"Nov", 11}, {"Dec", 12}};
 
 // Supported time format: 06/Jul/2022:06:32:41 +0300
-std::optional<DateTime> DateTime::Parse(const std::string& dt) {
+std::optional<DateTime> DateTime::Parse(std::string_view dt) {
   if (dt.size() != 26) {
     return std::nullopt;
   }

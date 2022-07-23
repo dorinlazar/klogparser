@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <chrono>
-#include <ctre.hpp>
+//#include <ctre.hpp>
 #include <map>
 
 namespace kl {
@@ -114,30 +114,56 @@ DateTime DateTime::operator+(TimeSpan ts) { return FromTicks(_ticks + ts.ticks);
 // auto date_format = ctre::match<
 //     R"(([0-3][0-9])/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/20([1-9][0-9]):([0-2][0-9]):([0-5][0-9]):([0-5][0-9])
 //     ([\+\-])([01][0-9])([0-5][0-9]))">;
-auto date_format = ctre::match<
-    R"(([0-3][0-9])/([JFMASOND][aepuco][nbrynlgptvc])/20([1-9][0-9]:[0-2][0-9]:[0-5][0-9]:[0-5][0-9] [\+\-][01][0-9][0-5][0-9]))">;
+// auto date_format = ctre::match<R"(([0-3][0-9]/[A-Z][a-z][a-z]/20[1-9][0-9]))">;
+// auto time_format = ctre::match<R"(:([0-2][0-9]:[0-5][0-9]:[0-5][0-9] [\+\-][01][0-9][0-5][0-9]))">;
 
 std::map<std::string, uint32_t> months = {{"Jan", 1}, {"Feb", 2}, {"Mar", 3}, {"Apr", 4},  {"May", 5},  {"Jun", 6},
                                           {"Jul", 7}, {"Aug", 8}, {"Sep", 9}, {"Oct", 10}, {"Nov", 11}, {"Dec", 12}};
 
+// Supported time format: 06/Jul/2022:06:32:41 +0300
 std::optional<DateTime> DateTime::Parse(const std::string& dt) {
-  auto parsed = date_format(dt);
-  if (!parsed.get<0>()) {
+  if (dt.size() != 26) {
     return std::nullopt;
   }
-  auto view = parsed.get<1>().to_view();
-  uint32_t day = (view[0] - '0') * 10 + view[1] - '0';
-  auto it = months.find(std::string(parsed.get<2>()));
+
+  if (dt[2] != '/' || dt[6] != '/' || dt[11] != ':' || dt[14] != ':' || dt[17] != ':' || dt[20] != ' ') {
+    return std::nullopt;
+  }
+  if (dt[0] > '3' || dt[0] < '0' || dt[1] > '9' || dt[1] < '0') {
+    return std::nullopt;
+  }
+  uint32_t day = (dt[0] - '0') * 10 + dt[1] - '0';
+  auto it = months.find(dt.substr(3, 3));
   if (it == months.end()) {
     return std::nullopt;
   }
   uint32_t month = it->second;
-  view = parsed.get<3>().to_view();
-  uint32_t year = 2000 + (view[0] - '0') * 10 + view[1] - '0';
-  uint32_t hour = (view[3] - '0') * 10 + view[4] - '0';
-  uint32_t minute = (view[6] - '0') * 10 + view[7] - '0';
-  uint32_t second = (view[9] - '0') * 10 + view[10] - '0';
-  return DateTime(year, month, day, hour, minute, second);
+
+  if (dt[9] > '9' || dt[9] < '0' || dt[10] > '9' || dt[10] < '0') {
+    return std::nullopt;
+  }
+  uint32_t year = 2000 + (dt[9] - '0') * 10 + dt[10] - '0';
+
+  if (dt[12] > '2' || dt[12] < '0' || dt[13] > '9' || dt[13] < '0') {
+    return std::nullopt;
+  }
+  uint32_t hour = (dt[12] - '0') * 10 + dt[13] - '0';
+
+  if (dt[15] > '5' || dt[15] < '0' || dt[16] > '9' || dt[16] < '0') {
+    return std::nullopt;
+  }
+  uint32_t minute = (dt[15] - '0') * 10 + dt[16] - '0';
+
+  if (dt[18] > '5' || dt[18] < '0' || dt[19] > '9' || dt[19] < '0') {
+    return std::nullopt;
+  }
+  uint32_t second = (dt[18] - '0') * 10 + dt[19] - '0';
+
+  DateTime res(year, month, day, hour, minute, second);
+  if (res._ticks == 0) {
+    return std::nullopt;
+  }
+  return res;
 }
 
 } // namespace kl

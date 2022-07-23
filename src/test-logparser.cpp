@@ -1,16 +1,7 @@
 #include <ctre.hpp>
 #include <iostream>
-#include <string>
-
-struct LogInfo {
-  std::string remote_addr;
-  std::string time_local;
-  std::string request;
-  uint32_t status;
-  uint32_t body_bytes_sent;
-  std::string http_referer;
-  std::string http_user_agent;
-};
+#include "stringdb.hpp"
+#include "loginfo.hpp"
 
 int main() {
   std::string line;

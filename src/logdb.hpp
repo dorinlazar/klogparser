@@ -1,9 +1,9 @@
 #pragma once
 
-#include "loginfo.hpp"
-#include "kltime.hpp"
 #include <map>
 #include <string_view>
+
+#include "loginfo.hpp"
 
 class LogDatabase {
 public:

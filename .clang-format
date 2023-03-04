@@ -8,5 +8,5 @@ SpaceBeforeRangeBasedForLoopColon: No
 ColumnLimit: 120
 AlwaysBreakTemplateDeclarations: Yes
 AllowShortCaseLabelsOnASingleLine: Yes
-Standard: c++20
+Standard: c++23
 SortIncludes: Never
